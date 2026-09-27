@@ -266,8 +266,28 @@ summary:focus-visible {
   gap: var(--space-3);
 }
 
-.nav-toggle {
+/* Мобильное меню — чистый CSS через <details>, без JS.
+   Структура в index.html:
+     <details class="mobile-nav">
+       <summary class="nav-toggle">...icon-menu / icon-close...</summary>
+     </details>
+   и следом, как sibling внутри .container, идёт <nav class="nav-mobile">.
+   Раскрытие мобильного nav завязано на атрибут [open] через :has(). */
+
+.mobile-nav {
   display: none;
+}
+
+.mobile-nav summary {
+  list-style: none;
+}
+
+.mobile-nav summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-toggle {
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -276,6 +296,18 @@ summary:focus-visible {
   border: 1px solid var(--c-border);
   border-radius: var(--radius-sm);
   color: var(--c-text);
+}
+
+.nav-toggle .icon-close {
+  display: none;
+}
+
+.mobile-nav[open] .nav-toggle .icon-menu {
+  display: none;
+}
+
+.mobile-nav[open] .nav-toggle .icon-close {
+  display: block;
 }
 
 .nav-mobile {
@@ -298,7 +330,7 @@ summary:focus-visible {
   border-bottom: none;
 }
 
-.site-header.is-open .nav-mobile {
+.site-header:has(.mobile-nav[open]) .nav-mobile {
   display: flex;
 }
 
@@ -929,24 +961,64 @@ summary:focus-visible {
 }
 
 /* ==========================================================================
-   Reveal-on-scroll (single, restrained pattern)
+   Появление при загрузке (чистый CSS, без scroll-триггера — без JS
+   отследить появление элемента во вьюпорте при скролле нельзя, поэтому
+   карточки мягко проявляются один раз при рендере страницы, с лёгким
+   каскадом по каждой сетке).
    ========================================================================== */
 
-.reveal {
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
+.course-card,
+.advantage-card,
+.team-card,
+.review-card,
+.faq-item {
+  animation: fade-in-up 0.6s ease both;
+}
+
+.course-card:nth-child(2),
+.advantage-card:nth-child(2),
+.team-card:nth-child(2),
+.review-card:nth-child(2),
+.faq-item:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.advantage-card:nth-child(3),
+.review-card:nth-child(3),
+.faq-item:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.advantage-card:nth-child(4),
+.review-card:nth-child(4),
+.faq-item:nth-child(4) {
+  animation-delay: 0.18s;
+}
+.advantage-card:nth-child(5),
+.faq-item:nth-child(5) {
+  animation-delay: 0.24s;
+}
+.advantage-card:nth-child(6),
+.faq-item:nth-child(6) {
+  animation-delay: 0.3s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
+  .course-card,
+  .advantage-card,
+  .team-card,
+  .review-card,
+  .faq-item {
+    animation: none;
   }
 }
 
@@ -978,8 +1050,8 @@ summary:focus-visible {
     display: none;
   }
 
-  .nav-toggle {
-    display: flex;
+  .mobile-nav {
+    display: block;
   }
 
   .courses-grid,
